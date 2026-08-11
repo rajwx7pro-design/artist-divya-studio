@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Divya Studio | Admin & Booking Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Header Navigation -->
+    <nav class="bg-purple-900 text-white p-4 flex justify-between items-center shadow-lg">
+        <h1 class="text-xl font-bold flex items-center gap-2">
+            <i class="fas fa-paint-brush text-pink-400"></i>
+            Artist Divya Studio
+        </h1>
+        <div class="space-x-2">
+            <button onclick="switchTab('booking')" class="bg-purple-700 hover:bg-purple-800 px-3 py-1 rounded text-sm">Book Service</button>
+            <button onclick="openAdminAuth()" class="bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded text-sm font-semibold">Admin Panel</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto my-6 p-4">
+
+        <!-- BOOKING TAB -->
+        <div id="bookingTab" class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-purple-900 border-b pb-2">Book an Art Service</h2>
+            <form id="bookingForm" onsubmit="handleBooking(event)" class="space-y-4">
+                
+                <!-- Category Select -->
+                <div>
+                    <label class="block font-medium mb-1">Select Service Category:</label>
+                    <select id="serviceCategory" class="w-full border p-2 rounded" onchange="updateVariantOptions()">
+                        <option value="pencil">Pencil Sketch</option>
+                        <option value="color">Color Sketch</option>
+                        <option value="mehandi">Mehandi Service</option>
+                        <option value="rangoli">Rangoli Art</option>
+                    </select>
+                </div>
+
+                <!-- Size / Variant Select -->
+                <div>
+                    <label class="block font-medium mb-1">Select Size / Type:</label>
+                    <select id="serviceVariant" class="w-full border p-2 rounded" onchange="updateCalculatedPrice()">
+                        <!-- Dynamic Options Loaded via JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="custName" placeholder="Full Name" required class="border p-2 rounded w-full">
+                    <input type="tel" id="custPhone" placeholder="WhatsApp Phone Number" required class="border p-2 rounded w-full">
+                </div>
+
+                <!-- Coupon Section -->
+                <div>
+                    <label class="block font-medium">Have a Coupon?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="couponInput" placeholder="Enter Coupon Code" class="border p-2 rounded flex-1 uppercase">
+                        <button type="button" onclick="applyCoupon()" class="bg-gray-800 text-white px-4 py-2 rounded">Apply</button>
+                    </div>
+                    <p id="couponMsg" class="text-sm mt-1"></p>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="bg-purple-50 p-4 rounded border text-right">
+                    <p class="text-gray-600">Selected Product Price: ₹<span id="displayBasePrice">0</span></p>
+                    <p class="text-green-600 font-semibold">Discount: -₹<span id="displayDiscount">0</span></p>
+                    <p class="text-xl font-bold text-purple-900 mt-1">Final Payable: ₹<span id="displayFinalPrice">0</span></p>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded text-lg">Confirm Booking & Pay</button>
+            </form>
+        </div>
+
+        <!-- ADMIN PANEL TAB -->
+        <div id="adminTab" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-purple-900 text-white p-4 rounded-lg">
+                <h2 class="text-xl font-bold">Admin Management Control</h2>
+                <button onclick="switchTab('booking')" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Logout Admin</button>
+            </div>
+
+            <!-- 1. Orders List -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-bold mb-3 text-purple-900 flex items-center gap-2"><i class="fas fa-list-alt"></i> Live Orders & Bookings</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border text-left text-sm">
+                        <thead>
+                            <tr class="bg-purple-100">
+                                <th class="border p-2">Date</th>
+                                <th class="border p-2">Customer</th>
+                                <th class="border p-2">Phone</th>
+                                <th class="border p-2">Service & Size</th>
+                                <th class="border p-2">Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Dynamic Orders Row -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. Individual Product Prices Edit -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-bold mb-3 text-purple-900 flex items-center gap-2"><i class="fas fa-tags"></i> Edit Individual Product/Size Prices</h3>
+                
+                <!-- Pencil Prices -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 border-b pb-1 mb-2">Pencil Sketch Sizes:</h4>
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <div>A4 Size (₹): <input type="number" id="p_pencil_a4" class="border p-1 w-full rounded"></div>
+                        <div>A3 Size (₹): <input type="number" id="p_pencil_a3" class="border p-1 w-full rounded"></div>
+                        <div>A2 Size (₹): <input type="number" id="p_pencil_a2" class="border p-1 w-full rounded"></div>
+                    </div>
+                </div>
+
+                <!-- Color Sketch Prices -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 border-b pb-1 mb-2">Color Sketch Sizes:</h4>
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <div>A4 Size (₹): <input type="number" id="p_color_a4" class="border p-1 w-full rounded"></div>
+                        <div>A3 Size (₹): <input type="number" id="p_color_a3" class="border p-1 w-full rounded"></div>
+                        <div>A2 Size (₹): <input type="number" id="p_color_a2" class="border p-1 w-full rounded"></div>
+                    </div>
+                </div>
+
+                <!-- Mehandi Prices -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 border-b pb-1 mb-2">Mehandi Types:</h4>
+                    <div class="grid grid-cols-3 gap-2 text-sm">
+                        <div>Basic (₹): <input type="number" id="p_mehandi_basic" class="border p-1 w-full rounded"></div>
+                        <div>Bridal (₹): <input type="number" id="p_mehandi_bridal" class="border p-1 w-full rounded"></div>
+                        <div>Full Hand (₹): <input type="number" id="p_mehandi_full" class="border p-1 w-full rounded"></div>
+                    </div>
+                </div>
+
+                <!-- Rangoli Prices -->
+                <div class="mb-4">
+                    <h4 class="font-bold text-gray-700 border-b pb-1 mb-2">Rangoli Types:</h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>Simple Event (₹): <input type="number" id="p_rangoli_simple" class="border p-1 w-full rounded"></div>
+                        <div>Grand Event (₹): <input type="number" id="p_rangoli_grand" class="border p-1 w-full rounded"></div>
+                    </div>
+                </div>
+
+                <button onclick="saveAllProductPrices()" class="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800">Save All Prices</button>
+            </div>
+
+            <!-- 3. Create Coupon (Percentage OR Amount) -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-bold mb-3 text-purple-900 flex items-center gap-2"><i class="fas fa-ticket-alt"></i> Create Coupon Code</h3>
+                <div class="space-y-4">
+                    <input type="text" id="newCouponCode" placeholder="COUPON CODE (e.g. DIVYA50)" class="border p-2 rounded w-full uppercase">
+                    
+                    <div>
+                        <label class="block font-medium mb-1">Select Discount Type:</label>
+                        <div class="flex items-center gap-6">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="discountType" value="amount" checked onclick="toggleDiscountInput()">
+                                Fixed Amount (₹)
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="discountType" value="percent" onclick="toggleDiscountInput()">
+                                Percentage (%)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label id="discountValLabel" class="block text-sm font-medium">Discount Value (₹):</label>
+                        <input type="number" id="newDiscountValue" placeholder="Enter Amount or Percentage" class="border p-2 rounded w-full">
+                    </div>
+
+                    <button onclick="createNewCoupon()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Coupon</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Direct Instagram Contact -->
+    <div class="text-center my-8">
+        <a href="https://instagram.com/divya_arthub" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full font-bold shadow-md hover:opacity-90 inline-flex items-center gap-2">
+            <i class="fab fa-instagram text-xl"></i> Chat on Instagram (@divya_arthub)
+        </a>
+    </div>
+
+    <!-- JavaScript Engine -->
+    <script>
+        // Individual Product Prices Database
+        let appData = {
+            adminPass: "DivyaRaj123@DR",
+            products: {
+                pencil: { "A4 Size": 499, "A3 Size": 899, "A2 Size": 1499 },
+                color: { "A4 Size": 799, "A3 Size": 1299, "A2 Size": 1999 },
+                mehandi: { "Basic Design": 499, "Bridal Mehandi": 2499, "Full Hand": 999 },
+                rangoli: { "Simple Event": 999, "Grand Event": 2499 }
+            },
+            coupons: { "WELCOME10": { type: "percent", val: 10 } },
+            orders: [],
+            appliedDiscount: 0
+        };
+
+        // Initialize App
+        window.onload = function() {
+            updateVariantOptions();
+            loadPricesInAdmin();
+        };
+
+        function switchTab(tabName) {
+            document.getElementById('bookingTab').classList.add('hidden');
+            document.getElementById('adminTab').classList.add('hidden');
+            if (tabName === 'booking') document.getElementById('bookingTab').classList.remove('hidden');
+            if (tabName === 'admin') document.getElementById('adminTab').classList.remove('hidden');
+        }
+
+        function openAdminAuth() {
+            let pass = prompt("Enter Admin Passcode:");
+            if (pass === appData.adminPass) {
+                renderOrdersTable();
+                switchTab('admin');
+            } else if (pass !== null) {
+                alert("Incorrect Passcode!");
+            }
+        }
+
+        // Update Variants Dropdown dynamically based on Category
+        function updateVariantOptions() {
+            let cat = document.getElementById('serviceCategory').value;
+            let variantSelect = document.getElementById('serviceVariant');
+            variantSelect.innerHTML = "";
+
+            let variants = appData.products[cat];
+            for (let v in variants) {
+                let opt = document.createElement('option');
+                opt.value = v;
+                opt.innerText = `${v} - ₹${variants[v]}`;
+                variantSelect.appendChild(opt);
+            }
+            updateCalculatedPrice();
+        }
+
+        function updateCalculatedPrice() {
+            let cat = document.getElementById('serviceCategory').value;
+            let variant = document.getElementById('serviceVariant').value;
+            let basePrice = appData.products[cat][variant] || 0;
+
+            document.getElementById('displayBasePrice').innerText = basePrice;
+            let finalPrice = Math.max(0, basePrice - appData.appliedDiscount);
+            document.getElementById('displayFinalPrice').innerText = finalPrice;
+        }
+
+        function applyCoupon() {
+            let code = document.getElementById('couponInput').value.trim().toUpperCase();
+            let msg = document.getElementById('couponMsg');
+            let cat = document.getElementById('serviceCategory').value;
+            let variant = document.getElementById('serviceVariant').value;
+            let basePrice = appData.products[cat][variant];
+
+            if (appData.coupons[code]) {
+                let c = appData.coupons[code];
+                if (c.type === 'amount') {
+                    appData.appliedDiscount = c.val;
+                } else if (c.type === 'percent') {
+                    appData.appliedDiscount = Math.round((basePrice * c.val) / 100);
+                }
+                msg.className = "text-sm mt-1 text-green-600 font-semibold";
+                msg.innerText = "Coupon Applied!";
+                document.getElementById('displayDiscount').innerText = appData.appliedDiscount;
+                updateCalculatedPrice();
+            } else {
+                msg.className = "text-sm mt-1 text-red-600";
+                msg.innerText = "Invalid Coupon Code!";
+            }
+        }
+
+        // Admin Edit Prices Functions
+        function loadPricesInAdmin() {
+            document.getElementById('p_pencil_a4').value = appData.products.pencil["A4 Size"];
+            document.getElementById('p_pencil_a3').value = appData.products.pencil["A3 Size"];
+            document.getElementById('p_pencil_a2').value = appData.products.pencil["A2 Size"];
+
+            document.getElementById('p_color_a4').value = appData.products.color["A4 Size"];
+            document.getElementById('p_color_a3').value = appData.products.color["A3 Size"];
+            document.getElementById('p_color_a2').value = appData.products.color["A2 Size"];
+
+            document.getElementById('p_mehandi_basic').value = appData.products.mehandi["Basic Design"];
+            document.getElementById('p_mehandi_bridal').value = appData.products.mehandi["Bridal Mehandi"];
+            document.getElementById('p_mehandi_full').value = appData.products.mehandi["Full Hand"];
+
+            document.getElementById('p_rangoli_simple').value = appData.products.rangoli["Simple Event"];
+            document.getElementById('p_rangoli_grand').value = appData.products.rangoli["Grand Event"];
+        }
+
+        function saveAllProductPrices() {
+            appData.products.pencil["A4 Size"] = Number(document.getElementById('p_pencil_a4').value);
+            appData.products.pencil["A3 Size"] = Number(document.getElementById('p_pencil_a3').value);
+            appData.products.pencil["A2 Size"] = Number(document.getElementById('p_pencil_a2').value);
+
+            appData.products.color["A4 Size"] = Number(document.getElementById('p_color_a4').value);
+            appData.products.color["A3 Size"] = Number(document.getElementById('p_color_a3').value);
+            appData.products.color["A2 Size"] = Number(document.getElementById('p_color_a2').value);
+
+            appData.products.mehandi["Basic Design"] = Number(document.getElementById('p_mehandi_basic').value);
+            appData.products.mehandi["Bridal Mehandi"] = Number(document.getElementById('p_mehandi_bridal').value);
+            appData.products.mehandi["Full Hand"] = Number(document.getElementById('p_mehandi_full').value);
+
+            appData.products.rangoli["Simple Event"] = Number(document.getElementById('p_rangoli_simple').value);
+            appData.products.rangoli["Grand Event"] = Number(document.getElementById('p_rangoli_grand').value);
+
+            updateVariantOptions();
+            alert("All Product Prices Updated Successfully!");
+        }
+
+        function toggleDiscountInput() {
+            let type = document.querySelector('input[name="discountType"]:checked').value;
+            let label = document.getElementById('discountValLabel');
+            label.innerText = type === 'amount' ? "Discount Value (₹):" : "Discount Percentage (%):";
+        }
+
+        function createNewCoupon() {
+            let code = document.getElementById('newCouponCode').value.trim().toUpperCase();
+            let val = Number(document.getElementById('newDiscountValue').value);
+            let type = document.querySelector('input[name="discountType"]:checked').value;
+
+            if (!code || !val) {
+                alert("Please enter valid coupon code and discount value.");
+                return;
+            }
+
+            appData.coupons[code] = { type: type, val: val };
+            alert(`Coupon '${code}' created successfully!`);
+            document.getElementById('newCouponCode').value = "";
+            document.getElementById('newDiscountValue').value = "";
+        }
+
+        function handleBooking(e) {
+            e.preventDefault();
+            let cat = document.getElementById('serviceCategory').value;
+            let variant = document.getElementById('serviceVariant').value;
+            
+            let order = {
+                date: new Date().toLocaleDateString(),
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                service: `${cat.toUpperCase()} (${variant})`,
+                amount: document.getElementById('displayFinalPrice').innerText
+            };
+
+            appData.orders.push(order);
+            alert("Booking Confirmed Successfully!");
+            document.getElementById('bookingForm').reset();
+            appData.appliedDiscount = 0;
+            document.getElementById('displayDiscount').innerText = "0";
+            updateVariantOptions();
+        }
+
+        function renderOrdersTable() {
+            let tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = "";
+
+            if (appData.orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="border p-3 text-center text-gray-500">No Orders Found Yet.</td></tr>`;
+                return;
+            }
+
+            appData.orders.forEach(o => {
+                let row = `<tr>
+                    <td class="border p-2">${o.date}</td>
+                    <td class="border p-2 font-semibold">${o.name}</td>
+                    <td class="border p-2">${o.phone}</td>
+                    <td class="border p-2">${o.service}</td>
+                    <td class="border p-2 font-bold text-green-700">₹${o.amount}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
