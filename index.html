@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artist Divya Studio</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#0d0d0d;--panel:#1a1f2e;--gold:#d4a853;--light:#f4d98f}
+    *{box-sizing:border-box}
+    body{margin:0;background:#0d0d0d;color:#f4efe5;font-family:"DM Sans",sans-serif;padding-bottom:80px}
+    .display{font-family:"Playfair Display",serif}
+    .hidden-view{display:none!important}
+    .glass{background:rgba(26,31,46,.88);border:1px solid rgba(212,168,83,.3);box-shadow:0 20px 55px rgba(0,0,0,.35);backdrop-filter:blur(14px)}
+    .gold{background:linear-gradient(135deg,#f4d98f,#b98017);color:#1a1206;transition:.2s}
+    .gold:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .line{border-color:rgba(212,168,83,.28)}
+    .modal{background:rgba(0,0,0,.85);backdrop-filter:blur(9px)}
+    input,textarea,select{background:#111725!important;border:1px solid #565d6b!important;color:#fff!important;font-size:14px}
+    input:focus,textarea:focus,select:focus{outline:none!important;border-color:#d4a853!important;box-shadow:0 0 0 3px rgba(212,168,83,.14)!important}
+    .service:hover{transform:translateY(-5px)}
+    .service{transition:.25s}
+    .toast{transform:translate(-50%,150px);transition:.3s}
+    .toast.show{transform:translate(-50%,0)}
+    .bubble-admin{background:linear-gradient(135deg,#f4d98f,#b98017);color:#171004}
+    .bubble-client{background:#111725;border:1px solid rgba(212,168,83,.22)}
+    .faq-answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s}
+    .faq-answer>div{overflow:hidden}
+    .faq.open .faq-answer{grid-template-rows:1fr}
+    .price-box{border:1px solid rgba(212,168,83,.4);border-radius:12px;background:rgba(0,0,0,.3);padding:16px}
+    .price-box .row{display:flex;justify-content:space-between;padding:4px 0;font-size:14px}
+    .price-box .studio-price{color:#f4d98f;font-weight:700;font-size:16px}
+    .admin-tab.active{background:linear-gradient(135deg,#f4d98f,#b98017);color:#171004}
+  </style>
+  <script src="/_sdk/04cc6185e046f597.resizing_sdk.js"></script>
+  <script src="/_sdk/0e8d3a91e1c6f495.data_sdk.js"></script>
+ </head>
+ <body data-template-id="__page-root" class="w-full">
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 border-b line bg-[#0d0d0d]/95 backdrop-blur">
+   <nav class="w-full max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3" aria-label="Main navigation">
+    <div class="flex items-center gap-3 shrink-0">
+     <div class="w-10 h-10 rounded-full border line grid place-items-center display font-bold text-[#f4d98f]">D</div>
+     <div>
+      <h1 data-template-id="brand-name" class="canva-text display font-bold whitespace-nowrap">Artist Divya Studio</h1>
+      <p data-template-id="brand-tagline" class="canva-text text-xs text-stone-400">Handmade art, made personal</p>
+     </div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap justify-end">
+     <div id="member-grid" class="hidden-view flex items-center gap-3 rounded-lg border line bg-[#1a1f2e] px-3 py-2 text-xs whitespace-nowrap">
+      <span class="text-stone-400">Client:</span><span id="member-name" class="text-[#f4d98f] font-bold"></span>
+      <span class="text-stone-400">Mobile:</span><span id="member-phone" class="text-stone-300"></span>
+     </div>
+     <button id="orders-btn" class="hidden-view rounded-lg border line px-3 py-2 text-xs font-bold text-[#f4d98f] whitespace-nowrap" type="button" onclick="openOrders()">My Orders</button>
+     <button id="bell-btn" class="hidden-view relative rounded-lg border line p-2 text-[#f4d98f]" type="button" onclick="openNotices()" aria-label="Notifications"><i data-lucide="bell" class="w-4 h-4"></i><span id="bell-count" class="hidden-view absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-red-500 px-1 text-[10px] text-white"></span></button>
+     <button id="chat-btn" class="hidden-view rounded-lg border line px-3 py-2 text-xs font-bold text-[#f4d98f] flex items-center gap-1" type="button" onclick="openChat()" aria-label="Chat"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat</button>
+     <button id="admin-btn" class="hidden-view rounded-lg border line px-3 py-2 text-xs font-bold text-[#f4d98f] whitespace-nowrap" type="button" onclick="toggleAdmin()">Admin Panel</button>
+     <button id="signin-btn" data-template-id="signin-button" class="canva-button gold rounded-lg px-4 py-2 text-xs font-bold whitespace-nowrap" type="button" onclick="openLogin()">Sign In</button>
+     <button id="logout-btn" data-template-id="logout-button" class="canva-button gold hidden-view rounded-lg px-4 py-2 text-xs font-bold whitespace-nowrap" type="button" onclick="logout()">Logout</button>
+    </div>
+   </nav>
+  </header>
+
+  <!-- Public Website Section -->
+  <div id="public-view">
+   <main>
+    <!-- Hero Banner -->
+    <section data-template-id="hero-section" class="canva-section relative min-h-[430px] overflow-hidden flex items-center">
+     <img src="images/pencil-sketch.jpg" class="absolute inset-0 w-full h-full object-cover brightness-40" alt="Hero Artwork" onerror="this.style.display='none'">
+     <div class="absolute inset-0 bg-gradient-to-r from-[#080808]/95 via-[#080808]/80 to-black/30"></div>
+     <div class="relative w-full max-w-7xl mx-auto px-5 py-20">
+      <div class="max-w-2xl">
+       <p data-template-id="hero-kicker" class="canva-text mb-3 uppercase tracking-[.2em] text-[#f4d98f] text-xs font-bold">ART THAT HOLDS A MEMORY</p>
+       <h2 data-template-id="hero-title" class="canva-text display font-bold leading-tight mb-4 text-3xl md:text-4xl text-white">Fine Sketches &amp; Traditional Art</h2>
+       <p data-template-id="hero-copy" class="canva-text mb-7 text-stone-200 text-sm">Commission a portrait, a celebratory rangoli, or timeless Mehandi work created especially for your story.</p>
+       <a href="#services" data-template-id="hero-cta" class="canva-button gold inline-flex rounded-lg px-6 py-3 font-bold text-xs">Explore the collection</a>
+      </div>
+     </div>
+    </section>
+
+    <!-- Services Collection -->
+    <section id="services" class="w-full max-w-7xl mx-auto px-4 py-14">
+     <div class="text-center mb-9">
+      <p data-template-id="services-kicker" class="canva-text uppercase tracking-[.18em] text-xs text-[#d4a853] font-bold">MADE BY HAND</p>
+      <h2 data-template-id="services-title" class="canva-text display font-bold mt-2 text-2xl">Choose Your Art Form</h2>
+     </div>
+     <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+      <!-- Pencil Sketch -->
+      <article data-template-id="card-pencil" class="canva-card service overflow-hidden rounded-xl glass">
+       <img src="images/pencil-sketch.jpg" alt="Pencil Sketch" class="h-40 w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500';">
+       <div class="p-4">
+        <h3 data-template-id="title-pencil" class="canva-text display font-bold text-base">Pencil Sketch</h3>
+        <p data-template-id="desc-pencil" class="canva-text min-h-11 mt-1 text-xs text-stone-400">A timeless monochrome portrait drawn from a photo.</p>
+        <p class="mt-3 text-sm text-[#f4d98f] font-bold">From ₹1,499</p>
+        <button data-template-id="book-pencil" class="canva-button gold mt-3 w-full rounded-lg py-2 text-xs font-bold" onclick="openBooking('Pencil Sketch',1999,2999,599)">Book Now</button>
+       </div>
+      </article>
+
+      <!-- Color Sketch -->
+      <article data-template-id="card-color" class="canva-card service overflow-hidden rounded-xl glass">
+       <img src="images/color-sketch.jpg" alt="Color Sketch" class="h-40 w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=500';">
+       <div class="p-4">
+        <h3 data-template-id="title-color" class="canva-text display font-bold text-base">Color Sketch</h3>
+        <p data-template-id="desc-color" class="canva-text min-h-11 mt-1 text-xs text-stone-400">A vibrant portrait layered with expressive color.</p>
+        <p class="mt-3 text-sm text-[#f4d98f] font-bold">From ₹2,249</p>
+        <button data-template-id="book-color" class="canva-button gold mt-3 w-full rounded-lg py-2 text-xs font-bold" onclick="openBooking('Color Sketch',2999,4499,999)">Book Now</button>
+       </div>
+      </article>
+
+      <!-- Blood Sketch -->
+      <article data-template-id="card-blood" class="canva-card service overflow-hidden rounded-xl glass">
+       <img src="images/blood-sketch.jpg" alt="Blood Sketch" class="h-40 w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500';">
+       <div class="p-4">
+        <h3 data-template-id="title-blood" class="canva-text display font-bold text-base">Blood Sketch</h3>
+        <p data-template-id="desc-blood" class="canva-text min-h-11 mt-1 text-xs text-stone-400">A dramatic and unique custom artwork.</p>
+        <p class="mt-3 text-sm text-[#f4d98f] font-bold">From ₹1,499</p>
+        <button data-template-id="book-blood" class="canva-button gold mt-3 w-full rounded-lg py-2 text-xs font-bold" onclick="openBooking('Blood Sketch',1999,2999,599)">Book Now</button>
+       </div>
+      </article>
+
+      <!-- Mehandi Design -->
+      <article data-template-id="card-mehndi" class="canva-card service overflow-hidden rounded-xl glass">
+       <img src="images/mehndi-design.jpg" alt="Mehandi Design" class="h-40 w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500';">
+       <div class="p-4">
+        <h3 data-template-id="title-mehndi" class="canva-text display font-bold text-base">Mehandi Design</h3>
+        <p data-template-id="desc-mehndi" class="canva-text min-h-11 mt-1 text-xs text-stone-400">Graceful intricate designs for celebrations.</p>
+        <p class="mt-3 text-sm text-[#f4d98f] font-bold">From ₹1,999</p>
+        <button data-template-id="book-mehndi" class="canva-button gold mt-3 w-full rounded-lg py-2 text-xs font-bold" onclick="openBooking('Mehandi Design',1999,2999,599)">Order Now</button>
+       </div>
+      </article>
+
+      <!-- Rangoli Art -->
+      <article data-template-id="card-rangoli" class="canva-card service overflow-hidden rounded-xl glass">
+       <img src="images/rangoli-art.jpg" alt="Rangoli Art" class="h-40 w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1605809201072-675986126950?w=500';">
+       <div class="p-4">
+        <h3 data-template-id="title-rangoli" class="canva-text display font-bold text-base">Rangoli Art</h3>
+        <p data-template-id="desc-rangoli" class="canva-text min-h-11 mt-1 text-xs text-stone-400">Festive floor art for special occasions.</p>
+        <p class="mt-3 text-sm text-[#f4d98f] font-bold">From ₹2,499</p>
+        <button data-template-id="book-rangoli" class="canva-button gold mt-3 w-full rounded-lg py-2 text-xs font-bold" onclick="openBooking('Rangoli Art',2499,3699,799)">Order Now</button>
+       </div>
+      </article>
+     </div>
+
+     <!-- Badges -->
+     <div class="mt-8 grid md:grid-cols-2 gap-4">
+      <button data-template-id="refund-badge" class="canva-banner glass rounded-xl p-4 text-left text-xs" onclick="openPolicy()"><span class="font-bold text-[#f4d98f]">✦ 24h Token Refund Policy:</span> Full refund within 24 hours unless artwork has started.</button>
+      <div data-template-id="delivery-badge" class="canva-banner glass rounded-xl p-4 text-left text-xs"><span class="font-bold text-[#f4d98f]">✦ On-Time Delivery Guarantee:</span> Delivered on or before your event date.</div>
+     </div>
+    </section>
+
+    <!-- Reviews & FAQ -->
+    <section class="w-full max-w-7xl mx-auto px-4 pb-14 grid lg:grid-cols-2 gap-6">
+     <section data-template-id="reviews-section" class="canva-section glass rounded-2xl p-6">
+      <h2 data-template-id="reviews-title" class="canva-text display font-bold text-xl">Loved by Clients ❤️</h2>
+      <div class="mt-5 space-y-4">
+       <div class="border-b line pb-4">
+        <div class="text-[#f4d98f]">★★★★★</div>
+        <p data-template-id="review-one" class="canva-text mt-2 text-sm text-stone-300">"The pencil portrait was super realistic! Expressed my feelings so well." - Priyanshu S.</p>
+       </div>
+       <div>
+        <div class="text-[#f4d98f]">★★★★★</div>
+        <p data-template-id="review-two" class="canva-text mt-2 text-sm text-stone-300">"Amazing bridal mehandi service. On-time and extremely detailed work!" - Sneha V.</p>
+       </div>
+      </div>
+     </section>
+
+     <section data-template-id="faq-section" class="canva-section glass rounded-2xl p-6">
+      <h2 data-template-id="faq-title" class="canva-text display font-bold mb-3 text-xl">Frequently Asked Questions</h2>
+      <div class="faq border-b line py-2">
+       <button data-template-id="faq-q1" class="canva-button flex w-full items-center justify-between py-2 text-left font-semibold text-sm" onclick="toggleFaq(this)">How long does a sketch take?</button>
+       <div class="faq-answer">
+        <div data-template-id="faq-a1" class="canva-text pb-2 text-sm text-stone-400">Standard portrait creation takes 3-5 business days depending on detail.</div>
+       </div>
+      </div>
+      <div class="faq border-b line py-2">
+       <button data-template-id="faq-q2" class="canva-button flex w-full items-center justify-between py-2 text-left font-semibold text-sm" onclick="toggleFaq(this)">Do you ship worldwide?</button>
+       <div class="faq-answer">
+        <div data-template-id="faq-a2" class="canva-text pb-2 text-sm text-stone-400">Yes, we safely package and deliver artworks across India and internationally.</div>
+       </div>
+      </div>
+      <div class="faq py-2">
+       <button data-template-id="faq-q3" class="canva-button flex w-full items-center justify-between py-2 text-left font-semibold text-sm" onclick="toggleFaq(this)">How does token payment work?</button>
+       <div class="faq-answer">
+        <div data-template-id="faq-a3" class="canva-text pb-2 text-sm text-stone-400">Pay a small token amount to confirm your booking. The balance is paid upon delivery.</div>
+       </div>
+      </div>
+     </section>
+    </section>
+   </main>
+
+   <footer class="border-t line py-8 text-center">
+    <p data-template-id="footer-copy" class="canva-text text-sm text-stone-500">© 2026 Artist Divya Studio. Crafted with care, one memory at a time.</p>
+   </footer>
+  </div>
+
+  <!-- Admin Panel View -->
+  <section id="admin-view" class="hidden-view w-full max-w-7xl mx-auto p-4 md:p-8">
+   <div class="flex justify-between gap-3 mb-6">
+    <div>
+     <p class="text-xs uppercase tracking-[.18em] text-[#d4a853]">Studio Control Room</p>
+     <h2 class="display text-3xl text-[#f4d98f]">Admin Panel</h2>
+    </div>
+    <button class="border line rounded-lg px-4 text-sm text-[#f4d98f]" onclick="toggleAdmin()">Public View</button>
+   </div>
+
+   <div class="flex flex-wrap gap-2 mb-5" id="admin-tabs">
+    <button class="admin-tab gold rounded-lg px-4 py-2 text-sm" onclick="adminTab('active', this)">Active Orders</button>
+    <button class="admin-tab border line rounded-lg px-4 py-2 text-sm" onclick="adminTab('history', this)">Booking History</button>
+    <button class="admin-tab border line rounded-lg px-4 py-2 text-sm" onclick="adminTab('coupons', this)">Coupon Manager</button>
+    <button class="admin-tab border line rounded-lg px-4 py-2 text-sm" onclick="adminTab('chat', this)">Chat Center</button>
+    <button class="admin-tab border line rounded-lg px-4 py-2 text-sm" onclick="adminTab('broadcast', this)">Broadcasts</button>
+   </div>
+
+   <section id="panel-active" class="glass rounded-2xl p-5">
+    <h3 class="display text-xl text-[#f4d98f] mb-4">Active Orders</h3>
+    <div id="active-orders" class="space-y-3"></div>
+   </section>
+
+   <section id="panel-history" class="hidden-view glass rounded-2xl p-5">
+    <h3 class="display text-xl text-[#f4d98f] mb-4">Booking History</h3>
+    <div id="history-orders" class="space-y-3"></div>
+   </section>
+
+   <section id="panel-coupons" class="hidden-view glass rounded-2xl p-5">
+    <h3 class="display text-xl text-[#f4d98f] mb-3">Coupon Manager</h3>
+    <form id="coupon-form" class="max-w-xl space-y-3">
+      <div>
+        <label class="block text-xs text-stone-400 mb-1">Coupon Code</label>
+        <input id="cpn-code" required class="w-full rounded-lg p-2 text-xs uppercase" placeholder="e.g. DIVYA50">
+      </div>
+      <div class="flex gap-4 text-xs">
+        <label><input type="radio" name="cpn-type" value="amount" checked> Flat ₹</label>
+        <label><input type="radio" name="cpn-type" value="percent"> Percentage %</label>
+      </div>
+      <div>
+        <label class="block text-xs text-stone-400 mb-1">Discount Value</label>
+        <input id="cpn-val" type="number" required class="w-full rounded-lg p-2 text-xs" placeholder="e.g. 100 or 10">
+      </div>
+      <button class="gold rounded-lg px-4 py-2 text-xs font-bold">Save Coupon</button>
+    </form>
+   </section>
+
+   <section id="panel-chat" class="hidden-view glass rounded-2xl p-4">
+    <div class="grid lg:grid-cols-[300px_1fr] min-h-[480px]">
+     <aside id="thread-list" class="border-b lg:border-b-0 lg:border-r line p-2 overflow-y-auto max-h-[480px]"></aside>
+     <div class="flex flex-col">
+      <div id="chat-head" class="border-b line p-4 text-sm text-stone-400">Select a customer conversation</div>
+      <div id="admin-messages" class="flex-1 p-4 space-y-3 overflow-y-auto max-h-[360px]"></div>
+      <form id="admin-form" class="flex gap-2 border-t line p-3">
+       <label for="admin-input" class="sr-only">Reply</label>
+       <input id="admin-input" disabled class="min-w-0 flex-1 rounded-lg px-3 py-2 text-sm" placeholder="Write a reply">
+       <button class="gold rounded-lg px-4 font-bold text-xs" id="admin-send" disabled>Send</button>
+      </form>
+     </div>
+    </div>
+   </section>
+
+   <section id="panel-broadcast" class="hidden-view glass rounded-2xl p-5">
+    <h3 class="display text-xl text-[#f4d98f]">Notification Dispatcher</h3>
+    <form id="broadcast-form" class="mt-4 max-w-xl space-y-3">
+     <label class="block text-sm" for="broadcast-message">Message to all customers</label>
+     <textarea id="broadcast-message" required rows="4" class="w-full rounded-lg p-3 text-xs" placeholder="Write your studio update"></textarea>
+     <button class="gold rounded-lg px-5 py-2 text-xs font-bold">Send Broadcast</button>
+    </form>
+   </section>
+  </section>
+
+  <!-- Login Modal (Smart 3-Step) -->
+  <div id="login-modal" class="modal hidden-view fixed inset-0 z-50 grid place-items-center p-4">
+   <section class="glass w-full max-w-sm rounded-2xl p-6">
+    <div class="flex justify-between">
+     <h2 id="login-modal-title" class="display font-bold text-lg">Sign In / Register</h2>
+     <button onclick="closeModal('login-modal')" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    
+    <!-- Step 1: Phone -->
+    <form id="login-step1" class="mt-5 space-y-4">
+     <div>
+      <label class="block mb-1 text-xs text-stone-400" for="login-phone">Mobile Phone</label>
+      <input id="login-phone" required maxlength="10" inputmode="numeric" placeholder="10-digit number" class="w-full rounded-lg p-2.5 text-xs">
+     </div>
+     <button class="gold w-full rounded-lg py-2.5 text-xs font-bold" type="submit">Next</button>
+    </form>
+
+    <!-- Step 2: OTP -->
+    <form id="login-step2" class="mt-5 space-y-4 hidden-view">
+     <p class="text-xs text-stone-400">Enter test OTP: <b class="text-[#f4d98f]">123456</b></p>
+     <div>
+      <input id="login-otp" required maxlength="6" inputmode="numeric" placeholder="123456" class="w-full rounded-lg p-2.5 text-center tracking-[.4em] text-xs">
+     </div>
+     <button class="gold w-full rounded-lg py-2.5 text-xs font-bold" type="submit">Verify OTP</button>
+    </form>
+
+    <!-- Step 3: Name (Only New Users) -->
+    <form id="login-step3" class="mt-5 space-y-4 hidden-view">
+     <p class="text-xs text-stone-400">Welcome! Enter your name to complete sign up.</p>
+     <div>
+      <label class="block mb-1 text-xs text-stone-400" for="login-name">Your Full Name</label>
+      <input id="login-name" required placeholder="Full Name" class="w-full rounded-lg p-2.5 text-xs">
+     </div>
+     <button class="gold w-full rounded-lg py-2.5 text-xs font-bold" type="submit">Complete Registration</button>
+    </form>
+   </section>
+  </div>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="modal hidden-view fixed inset-0 z-50 overflow-y-auto p-4">
+   <section class="glass w-full max-w-xl mx-auto my-6 rounded-2xl p-6">
+    <div class="flex justify-between">
+     <div>
+      <p class="text-[10px] uppercase tracking-[.18em] text-[#d4a853]">ROYAL BOOKING REQUEST</p>
+      <h2 id="booking-title" class="display text-xl text-[#f4d98f]">Artwork Booking</h2>
+     </div>
+     <button onclick="closeModal('booking-modal')" aria-label="Close booking"><i data-lucide="x"></i></button>
+    </div>
+    
+    <form id="booking-form" class="mt-5 space-y-3 text-xs">
+     <div class="grid sm:grid-cols-2 gap-3">
+      <div>
+       <label class="text-stone-400">Customer name</label>
+       <input id="book-name" required class="mt-1 w-full rounded-lg p-2">
+      </div>
+      <div>
+       <label class="text-stone-400">Mobile number</label>
+       <input id="book-phone" required maxlength="10" class="mt-1 w-full rounded-lg p-2">
+      </div>
+     </div>
+     <div>
+      <label class="text-stone-400">Delivery / event address</label>
+      <textarea id="book-address" required rows="2" class="mt-1 w-full rounded-lg p-2"></textarea>
+     </div>
+     <div class="grid sm:grid-cols-2 gap-3">
+      <div>
+       <label class="text-stone-400">Pincode</label>
+       <input id="book-pincode" required maxlength="6" class="mt-1 w-full rounded-lg p-2">
+      </div>
+      <div>
+       <label class="text-stone-400">Size / option</label>
+       <select id="book-variant" class="mt-1 w-full rounded-lg p-2" onchange="calculateBookingPrice()">
+        <option value="A4 Size">A4 Size</option>
+        <option value="A3 Size">A3 Size</option>
+        <option value="Custom Size">Custom Size</option>
+       </select>
+      </div>
+     </div>
+
+     <!-- Custom Dimensions Box (Min 12" x 8") -->
+     <div id="custom-dim-box" class="hidden-view p-3 rounded-lg border line bg-black/30 space-y-2">
+       <p class="text-[10px] text-[#f4d98f]">Minimum allowed size: 12" (Vertical) × 8" (Horizontal)</p>
+       <div class="grid grid-cols-2 gap-2">
+         <div>
+           <label class="text-stone-400 text-[10px]">Height / Length (Inches)</label>
+           <input type="number" id="dim-h" min="12" value="12" class="w-full p-2 rounded text-xs" oninput="calculateBookingPrice()">
+         </div>
+         <div>
+           <label class="text-stone-400 text-[10px]">Width (Inches)</label>
+           <input type="number" id="dim-w" min="8" value="8" class="w-full p-2 rounded text-xs" oninput="calculateBookingPrice()">
+         </div>
+       </div>
+     </div>
+
+     <!-- Coupon Apply Row -->
+     <div>
+        <label class="text-stone-400 mb-1 block">Have a Coupon?</label>
+        <div class="flex gap-2">
+            <input id="cpn-input" placeholder="COUPON CODE" class="flex-1 rounded-lg p-2 uppercase">
+            <button type="button" onclick="applyCoupon()" class="border line rounded-lg px-3 py-2 text-xs font-bold text-[#f4d98f]">Apply</button>
+        </div>
+        <p id="cpn-msg" class="text-[10px] mt-1"></p>
+     </div>
+
+     <div class="grid sm:grid-cols-2 gap-3" id="date-slot-box">
+      <div>
+       <label class="text-stone-400">Event date</label>
+       <input id="book-date" type="date" class="mt-1 w-full rounded-lg p-2">
+      </div>
+      <div>
+       <label class="text-stone-400">Choose your preferred start time</label>
+       <select id="book-slot" class="mt-1 w-full rounded-lg p-2">
+        <option>7:00 AM</option><option>8:00 AM</option><option>9:00 AM</option>
+        <option>10:00 AM</option><option>11:00 AM</option><option>12:00 PM</option>
+        <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+        <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+       </select>
+      </div>
+     </div>
+
+     <!-- Exact Price Breakdown Box -->
+     <div class="price-box space-y-1">
+      <div class="row"><span>MRP</span><span id="disp-mrp">₹2,999</span></div>
+      <div class="row studio-price"><span>Studio price</span><span id="disp-price">₹1,999</span></div>
+      <div class="row"><span>Required token today</span><span id="disp-token">₹599</span></div>
+      <div class="row"><span>Balance on completion</span><span id="disp-balance">₹1,400</span></div>
+     </div>
+
+     <button id="book-submit" class="canva-button gold w-full rounded-lg py-2.5 text-xs font-bold">Confirm Booking</button>
+    </form>
+   </section>
+  </div>
+
+  <div id="orders-modal" class="modal hidden-view fixed inset-0 z-50 overflow-y-auto p-4">
+   <section class="glass max-w-3xl mx-auto my-6 rounded-2xl p-6">
+    <div class="flex justify-between">
+     <h2 class="display font-bold text-lg text-[#f4d98f]">My Orders &amp; History</h2>
+     <button onclick="closeModal('orders-modal')" aria-label="Close orders"><i data-lucide="x"></i></button>
+    </div>
+    <div id="my-orders" class="mt-5 space-y-3"></div>
+   </section>
+  </div>
+
+  <div id="notices-modal" class="modal hidden-view fixed inset-0 z-50 overflow-y-auto p-4">
+   <section class="glass max-w-lg mx-auto my-6 rounded-2xl p-6">
+    <div class="flex justify-between">
+     <h2 class="display font-bold text-lg text-[#f4d98f]">Notifications</h2>
+     <button onclick="closeModal('notices-modal')" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div id="notice-list" class="mt-5 space-y-3"></div>
+   </section>
+  </div>
+
+  <div id="policy-modal" class="modal hidden-view fixed inset-0 z-50 grid place-items-center p-4">
+   <section class="glass max-w-lg rounded-2xl p-6">
+    <div class="flex justify-between">
+     <h2 class="display font-bold text-lg text-[#f4d98f]">24h Token Refund Policy</h2>
+     <button onclick="closeModal('policy-modal')" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <p class="mt-4 text-xs leading-5 text-stone-300">You are eligible for a full token refund within 24 hours of booking. EXCEPTION: If the artwork/sketch work has ALREADY BEEN STARTED by the artist within that 24-hour window, the Token Amount becomes strictly non-refundable.</p>
+   </section>
+  </div>
+
+  <div id="chat-modal" class="modal hidden-view fixed inset-0 z-50 grid place-items-center p-4">
+   <section class="glass flex w-full max-w-lg flex-col rounded-2xl" style="height:calc(75 * min(var(--vh,1vh),1vh))">
+    <div class="flex justify-between border-b line p-4">
+     <h2 class="display font-bold text-lg text-[#f4d98f]">Chat with Artist Divya</h2>
+     <button onclick="closeModal('chat-modal')" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div id="customer-messages" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+    <form id="customer-form" class="flex gap-2 border-t line p-3">
+     <input id="customer-input" required class="min-w-0 flex-1 rounded-lg p-2 text-xs" placeholder="Write a message">
+     <button class="gold rounded-lg px-4 font-bold text-xs">Send</button>
+    </form>
+   </section>
+  </div>
+
+  <div id="toast" class="toast fixed bottom-5 left-1/2 z-[90] rounded-lg border line bg-[#1a1f2e] px-4 py-3 text-xs text-[#f4d98f]">
+   <span id="toast-text"></span>
+  </div>
+
+  <script>
+    const ADMINS=["8928082194","9307952219"];
+    let orders=[], activeBooking=null, selectedThread="", appliedDisc=0;
+    let userRegistry=JSON.parse(localStorage.getItem("divya_users")||"{}");
+    let chats=JSON.parse(localStorage.getItem("divya_chats")||"{}");
+    let notices=JSON.parse(localStorage.getItem("divya_notices")||"[]");
+    let coupons=JSON.parse(localStorage.getItem("divya_coupons")||"{}");
+
+    const $=id=>document.getElementById(id);
+    const profile=()=>({name:localStorage.getItem("divya_name")||"",phone:localStorage.getItem("divya_phone")||""});
+    const esc=s=>String(s||"").replace(/[&<>"']/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[x]));
+    const money=n=>"₹"+Number(n||0).toLocaleString("en-IN");
+    const save=()=>{
+      localStorage.setItem("divya_users",JSON.stringify(userRegistry));
+      localStorage.setItem("divya_chats",JSON.stringify(chats));
+      localStorage.setItem("divya_notices",JSON.stringify(notices));
+      localStorage.setItem("divya_coupons",JSON.stringify(coupons));
+    };
+
+    function toast(t){$("toast-text").textContent=t;$("toast").classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>$("toast").classList.remove("show"),2800)}
+    function closeModal(id){$(id).classList.add("hidden-view")}
+    function logged(){return !!profile().phone}
+    function admin(){return ADMINS.includes(profile().phone)}
+
+    function updateAuth(){
+      let p=profile();
+      $("signin-btn").classList.toggle("hidden-view",!!p.phone);
+      ["logout-btn","member-grid","orders-btn","bell-btn","chat-btn"].forEach(x=>$(x).classList.toggle("hidden-view",!p.phone));
+      $("admin-btn").classList.toggle("hidden-view",!admin());
+      $("member-name").textContent=p.name;
+      $("member-phone").textContent=p.phone;
+      renderBell();
+    }
+
+    // Smart 3-Step Login Flow
+    let tempPhone = "";
+    function openLogin(){
+      tempPhone = "";
+      $("login-phone").value = "";
+      $("login-otp").value = "";
+      $("login-name").value = "";
+      $("login-step1").classList.remove("hidden-view");
+      $("login-step2").classList.add("hidden-view");
+      $("login-step3").classList.add("hidden-view");
+      $("login-modal").classList.remove("hidden-view");
+    }
+
+    $("login-step1").addEventListener("submit", e=>{
+      e.preventDefault();
+      let p=$("login-phone").value.replace(/\D/g,"");
+      if(p.length!==10){ toast("Enter valid 10-digit number."); return; }
+      tempPhone = p;
+      $("login-step1").classList.add("hidden-view");
+      $("login-step2").classList.remove("hidden-view");
+    });
+
+    $("login-step2").addEventListener("submit", e=>{
+      e.preventDefault();
+      if($("login-otp").value!=="123456"){ toast("Enter valid OTP 123456."); return; }
+      
+      if(userRegistry[tempPhone]){
+        // Returning User - Skip Name
+        localStorage.setItem("divya_phone", tempPhone);
+        localStorage.setItem("divya_name", userRegistry[tempPhone]);
+        closeModal("login-modal");
+        updateAuth();
+        toast("Welcome back, " + userRegistry[tempPhone]);
+      } else {
+        // New User - Ask Name
+        $("login-step2").classList.add("hidden-view");
+        $("login-step3").classList.remove("hidden-view");
+      }
+    });
+
+    $("login-step3").addEventListener("submit", e=>{
+      e.preventDefault();
+      let name = $("login-name").value.trim();
+      if(name.length < 2){ toast("Enter a valid name."); return; }
+      userRegistry[tempPhone] = name;
+      localStorage.setItem("divya_phone", tempPhone);
+      localStorage.setItem("divya_name", name);
+      save();
+      closeModal("login-modal");
+      updateAuth();
+      toast("Registration complete!");
+    });
+
+    function logout(){
+      localStorage.removeItem("divya_name");
+      localStorage.removeItem("divya_phone");
+      location.reload();
+    }
+
+    function openBooking(service, pPrice=1999, pMrp=2999, pToken=599){
+      if(!logged()){ openLogin(); toast("Please sign in to book."); return; }
+      appliedDisc = 0;
+      activeBooking = { service, price: pPrice, mrp: pMrp, token: pToken };
+      $("booking-title").textContent = service;
+      $("book-name").value = profile().name;
+      $("book-phone").value = profile().phone;
+      $("cpn-msg").textContent = "";
+      $("cpn-input").value = "";
+      
+      // Restrict date to tomorrow onwards
+      let tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      $("book-date").min = tomorrow.toISOString().split("T")[0];
+      $("book-date").value = tomorrow.toISOString().split("T")[0];
+
+      calculateBookingPrice();
+      $("booking-modal").classList.remove("hidden-view");
+    }
+
+    function calculateBookingPrice(){
+      let variant = $("book-variant").value;
+      let price = activeBooking.price;
+      let mrp = activeBooking.mrp;
+      let token = activeBooking.token;
+
+      if(variant === "Custom Size"){
+        $("custom-dim-box").classList.remove("hidden-view");
+        let h = Math.max(12, Number($("dim-h").value)||12);
+        let w = Math.max(8, Number($("dim-w").value)||8);
+        
+        let rawPrice = (h * w) * 20;
+        let rem = rawPrice % 100;
+        price = rem >= 50 ? (rawPrice - rem + 99) : (rawPrice - rem - 1);
+        if(price < 1199) price = 1199;
+        
+        mrp = Math.round(price + (price / 2));
+        token = Math.round(price * 0.33);
+        let tRem = token % 100;
+        token = tRem >= 50 ? (token - tRem + 99) : (token - tRem - 1);
+      } else {
+        $("custom-dim-box").classList.add("hidden-view");
+        if(variant === "A3 Size") price = Math.round(price * 0.75);
+      }
+
+      let finalToken = Math.max(0, token - appliedDisc);
+      let balance = Math.max(0, price - finalToken);
+
+      $("disp-mrp").textContent = money(mrp);
+      $("disp-price").textContent = money(price);
+      $("disp-token").textContent = money(finalToken);
+      $("disp-balance").textContent = money(balance);
+
+      activeBooking.calcPrice = price;
+      activeBooking.calcToken = finalToken;
+      activeBooking.calcBalance = balance;
+    }
+
+    function applyCoupon(){
+      let code = $("cpn-input").value.trim().toUpperCase();
+      if(coupons[code]){
+        let c = coupons[code];
+        appliedDisc = c.type === 'amount' ? c.val : Math.round((activeBooking.token * c.val) / 100);
+        calculateBookingPrice();
+        $("cpn-msg").className = "text-[10px] mt-1 text-green-400";
+        $("cpn-msg").textContent = "Coupon Applied!";
+      } else {
+        $("cpn-msg").className = "text-[10px] mt-1 text-red-400";
+        $("cpn-msg").textContent = "Invalid Code!";
+      }
+    }
+
+    $("booking-form").addEventListener("submit", async e=>{
+      e.preventDefault();
+      let b = $("book-submit");
+      b.disabled = true;
+      let result = await window.dataSdk.create({
+        customer_name: $("book-name").value.trim(),
+        phone: $("book-phone").value.replace(/\D/g,""),
+        address: $("book-address").value.trim(),
+        pincode: $("book-pincode").value.trim(),
+        service: activeBooking.service,
+        variant: $("book-variant").value,
+        booking_date: $("book-date").value||"N/A",
+        time_slot: $("book-slot").value,
+        token_paid: activeBooking.calcToken,
+        total_amount: activeBooking.calcPrice,
+        balance_due: activeBooking.calcBalance,
+        status: "Active",
+        cancel_reason: "",
+        work_started: "No",
+        created_at: new Date().toISOString()
+      });
+      b.disabled = false;
+      if(result.isOk){
+        closeModal("booking-modal");
+        toast("Booking request saved in Cloud!");
+      } else toast("Booking failed to save.");
+    });
+
+    function openOrders(){ $("orders-modal").classList.remove("hidden-view"); renderOrders(); }
+    function renderOrders(){
+      let mine = orders.filter(o => o.phone === profile().phone);
+      $("my-orders").innerHTML = mine.length ? mine.map(o => `
+        <article class="rounded-xl border line bg-black/20 p-4">
+          <div class="flex justify-between">
+            <div>
+              <h3 class="display text-base text-[#f4d98f]">${esc(o.service)}</h3>
+              <p class="text-xs text-stone-400">${esc(o.variant)} · ${esc(o.booking_date)} · ${esc(o.time_slot)}</p>
+            </div>
+            <b class="text-xs text-[#f4d98f]">${esc(o.status)}</b>
+          </div>
+          <p class="mt-2 text-xs">Token Paid: ${money(o.token_paid)} · Balance Due: ${money(o.balance_due)}</p>
+          ${o.cancel_reason ? `<p class="mt-2 text-xs text-red-300">Note: ${esc(o.cancel_reason)}</p>` : ""}
+        </article>
+      `).join("") : '<p class="py-8 text-center text-xs text-stone-500">No orders found.</p>';
+    }
+
+    function renderBell(){
+      let n = notices.filter(x => (x.recipient==="all" || x.recipient===profile().phone) && !x.read).length;
+      $("bell-count").textContent = n;
+      $("bell-count").classList.toggle("hidden-view", !n);
+    }
+
+    function openNotices(){
+      notices.forEach(n => n.read = true); save(); renderBell();
+      let list = notices.filter(n => n.recipient==="all" || n.recipient===profile().phone);
+      $("notice-list").innerHTML = list.map(n => `
+        <article class="rounded-xl border line bg-black/20 p-3">
+          <p class="text-xs">${esc(n.message)}</p>
+          <p class="mt-1 text-[10px] text-stone-500">${esc(n.time)}</p>
+        </article>
+      `).join("") || '<p class="py-6 text-center text-xs text-stone-500">No notifications.</p>';
+      $("notices-modal").classList.remove("hidden-view");
+    }
+
+    function openPolicy(){ $("policy-modal").classList.remove("hidden-view"); }
+    function openChat(){ if(!logged()){ openLogin(); return; } $("chat-modal").classList.remove("hidden-view"); renderCustomerChat(); }
+
+    function renderCustomerChat(){
+      let a = chats[profile().phone] || [];
+      $("customer-messages").innerHTML = a.map(m => `
+        <div class="flex ${m.sender==="customer" ? "justify-end" : "justify-start"}">
+          <div class="max-w-[82%] rounded-xl px-3 py-1.5 text-xs ${m.sender==="customer" ? "bubble-admin" : "bubble-client"}">
+            ${esc(m.text)}
+          </div>
+        </div>
+      `).join("") || '<p class="pt-10 text-center text-xs text-stone-500">Start a chat with artist.</p>';
+      $("customer-messages").scrollTop = 999999;
+    }
+
+    $("customer-form").addEventListener("submit", e=>{
+      e.preventDefault();
+      let text = $("customer-input").value.trim(), p = profile().phone;
+      if(!text) return;
+      (chats[p] = chats[p] || []).push({ sender: "customer", text, time: new Date().toLocaleTimeString(), read: false });
+      save();
+      $("customer-input").value = "";
+      renderCustomerChat();
+    });
+
+    function toggleAdmin(){
+      if(!admin()) return;
+      $("admin-view").classList.toggle("hidden-view");
+      $("public-view").classList.toggle("hidden-view");
+      renderAdmin();
+    }
+
+    function adminTab(x, btn){
+      ["active","history","coupons","chat","broadcast"].forEach(k => $("panel-"+k).classList.add("hidden-view"));
+      $("panel-"+x).classList.remove("hidden-view");
+      document.querySelectorAll(".admin-tab").forEach(b => b.className = "admin-tab border line rounded-lg px-4 py-2 text-sm");
+      btn.className = "admin-tab gold rounded-lg px-4 py-2 text-sm";
+      if(x === "chat") renderThreads();
+      if(x === "active" || x === "history") renderAdmin();
+    }
+
+    function renderAdmin(){
+      let active = orders.filter(o => !["Completed","Delivered","Cancelled"].includes(o.status));
+      let history = orders.filter(o => ["Completed","Delivered","Cancelled"].includes(o.status));
+      
+      $("active-orders").innerHTML = active.map(adminCard).join("") || '<p class="text-xs text-stone-500">No active orders.</p>';
+      $("history-orders").innerHTML = history.map(adminCard).join("") || '<p class="text-xs text-stone-500">No completed history.</p>';
+    }
+
+    function adminCard(o){
+      let isActive = !["Completed","Delivered","Cancelled"].includes(o.status);
+      return `
+        <article class="rounded-xl border line bg-black/20 p-3 text-xs space-y-1">
+          <div class="flex justify-between">
+            <b class="text-[#f4d98f]">${esc(o.customer_name)} (${esc(o.phone)})</b>
+            <b class="text-[#f4d98f]">${esc(o.status)}</b>
+          </div>
+          <p>${esc(o.service)} · ${esc(o.variant)} · ${esc(o.booking_date)} ${esc(o.time_slot)}</p>
+          <p class="text-stone-400">${esc(o.address)} (Pin: ${esc(o.pincode)})</p>
+          <p class="text-stone-400">Token: ${money(o.token_paid)} · Due: ${money(o.balance_due)}</p>
+          ${isActive ? `
+            <div class="flex gap-2 pt-2">
+              <button class="border line rounded px-2 py-1 text-[10px]" onclick="updateStatus('${o.__backendId}','Work Started')">Mark Started</button>
+              <button class="border line rounded px-2 py-1 text-[10px]" onclick="updateStatus('${o.__backendId}','Completed')">Mark Completed</button>
+              <button class="border border-red-400/50 text-red-300 rounded px-2 py-1 text-[10px]" onclick="updateStatus('${o.__backendId}','Cancelled')">Cancel</button>
+            </div>
+          ` : ""}
+        </article>
+      `;
+    }
+
+    async function updateStatus(id, status){
+      let o = orders.find(x => x.__backendId === id);
+      if(!o) return;
+      let r = await window.dataSdk.update({ ...o, status });
+      if(r.isOk) toast("Status updated: " + status);
+    }
+
+    $("coupon-form").addEventListener("submit", e=>{
+      e.preventDefault();
+      let code = $("cpn-code").value.trim().toUpperCase(), val = Number($("cpn-val").value), type = document.querySelector('input[name="cpn-type"]:checked').value;
+      if(code && val){
+        coupons[code] = { type, val };
+        save();
+        toast("Coupon created!");
+        $("cpn-code").value = ""; $("cpn-val").value = "";
+      }
+    });
+
+    function renderThreads(){
+      let phones = Object.keys(chats);
+      $("thread-list").innerHTML = phones.map(p => {
+        let m = chats[p], last = m[m.length-1];
+        let custName = userRegistry[p] || "Customer";
+        return `
+          <button class="w-full rounded-lg p-2 text-left hover:bg-white/5" onclick="selectThread('${p}')">
+            <b class="text-xs text-[#f4d98f]">${esc(custName)}</b>
+            <span class="text-[10px] text-stone-500 block">${p}</span>
+            <p class="truncate text-[10px] text-stone-400 mt-1">${esc(last?.text||"")}</p>
+          </button>
+        `;
+      }).join("") || '<p class="p-2 text-xs text-stone-500">No chat threads.</p>';
+      renderAdminMessages();
+    }
+
+    function selectThread(p){ selectedThread = p; renderThreads(); }
+    function renderAdminMessages(){
+      if(!selectedThread) return;
+      let name = userRegistry[selectedThread] || "Customer";
+      $("chat-head").textContent = `Chat: ${name} (${selectedThread})`;
+      $("admin-input").disabled = $("admin-send").disabled = false;
+      $("admin-messages").innerHTML = (chats[selectedThread] || []).map(m => `
+        <div class="flex ${m.sender==="admin" ? "justify-end" : "justify-start"}">
+          <div class="max-w-[82%] rounded-xl px-3 py-1.5 text-xs ${m.sender==="admin" ? "bubble-admin" : "bubble-client"}">
+            ${esc(m.text)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    $("admin-form").addEventListener("submit", e=>{
+      e.preventDefault();
+      let t = $("admin-input").value.trim();
+      if(!t || !selectedThread) return;
+      (chats[selectedThread] = chats[selectedThread] || []).push({ sender: "admin", text: t, time: new Date().toLocaleTimeString() });
+      save();
+      $("admin-input").value = "";
+      renderAdminMessages();
+    });
+
+    $("broadcast-form").addEventListener("submit", e=>{
+      e.preventDefault();
+      let msg = $("broadcast-message").value.trim();
+      if(!msg) return;
+      notices.unshift({ id: Date.now(), recipient: "all", message: msg, time: new Date().toLocaleString() });
+      save();
+      $("broadcast-message").value = "";
+      toast("Broadcast dispatched.");
+    });
+
+    function toggleFaq(b){ b.closest(".faq").classList.toggle("open"); }
+
+    (async () => {
+      updateAuth();
+      lucide.createIcons();
+      let r = await window.dataSdk.init({
+        onDataChanged(data){
+          orders = data;
+          renderAdmin();
+          if(!$("orders-modal").classList.contains("hidden-view")) renderOrders();
+        }
+      });
+      if(!r.isOk) toast("Database connection pending.");
+    })();
+  </script>
+ </body>
+</html>
