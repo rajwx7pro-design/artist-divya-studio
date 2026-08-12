@@ -32,6 +32,11 @@
     .price-box .studio-price{color:#f4d98f;font-weight:700;font-size:16px}
     .admin-tab.active{background:linear-gradient(135deg,#f4d98f,#b98017);color:#171004}
     .art-placeholder{background:linear-gradient(135deg,#1f2536,#111622);border-bottom:1px solid rgba(212,168,83,.2);display:flex;align-items:center;justify-content:center;color:#f4d98f}
+    
+    /* Hide reCAPTCHA badge overlay completely */
+    .grecaptcha-badge {
+      visibility: hidden !important;
+    }
   </style>
   <script src="/_sdk/04cc6185e046f597.resizing_sdk.js"></script>
   <script src="/_sdk/0e8d3a91e1c6f495.data_sdk.js"></script>
@@ -564,7 +569,7 @@
       renderBell();
     }
 
-    // Smart 3-Step Login Flow
+    // Smart 3-Step Login Flow (Direct SMS OTP)
     let tempPhone = "";
     function openLogin(){
       tempPhone = "";
