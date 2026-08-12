@@ -533,15 +533,16 @@
       renderBell();
     }
 
-    // Fast2SMS OTP Integration
-    let tempPhone = "";
-    function openLogin(){
+    // Direct Window Level Sign In Event Registration
+    window.openLogin = function(){
       tempPhone = "";
       $("login-step1").classList.remove("hidden-view");
       $("login-step2").classList.add("hidden-view");
       $("login-step3").classList.add("hidden-view");
       $("login-modal").classList.remove("hidden-view");
-    }
+    };
+
+    let tempPhone = "";
 
     $("login-step1").addEventListener("submit", async e=>{
       e.preventDefault();
@@ -603,8 +604,8 @@
 
     function logout(){ localStorage.clear(); location.reload(); }
 
-    function openBooking(service, category, pPrice, pMrp, pToken){
-      if(!logged()){ openLogin(); toast("Sign in to book."); return; }
+    window.openBooking = function(service, category, pPrice, pMrp, pToken){
+      if(!logged()){ window.openLogin(); toast("Sign in to book."); return; }
       appliedDisc = 0;
       activeBooking = { service, category, price: pPrice, mrp: pMrp, token: pToken };
       $("booking-title").textContent = service;
@@ -625,7 +626,7 @@
 
       calculateBookingPrice();
       $("booking-modal").classList.remove("hidden-view");
-    }
+    };
 
     function calculateBookingPrice(){
       let variant = $("book-variant").value;
@@ -763,7 +764,7 @@
     }
 
     function openPolicy(){ $("policy-modal").classList.remove("hidden-view"); }
-    function openChat(){ if(!logged()){ openLogin(); return; } $("chat-modal").classList.remove("hidden-view"); renderCustomerChat(); }
+    function openChat(){ if(!logged()){ window.openLogin(); return; } $("chat-modal").classList.remove("hidden-view"); renderCustomerChat(); }
 
     function renderCustomerChat(){
       let a = chats[profile().phone] || [];
@@ -954,11 +955,16 @@
 
     function toggleFaq(b){ b.closest(".faq").classList.toggle("open"); }
 
-    (async () => {
+    document.addEventListener("DOMContentLoaded", function() {
       updateAuth();
       if (window.lucide) window.lucide.createIcons();
       fetchOrdersFromSupabase();
-    })();
+      
+      const signinBtn = document.getElementById("signin-btn");
+      if(signinBtn) {
+        signinBtn.addEventListener("click", window.openLogin);
+      }
+    });
   </script>
  </body>
 </html>
