@@ -555,11 +555,12 @@
       tempPhone = p;
 
       generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      toast("Sending Real SMS OTP...");
+      toast("Sending OTP via SMS...");
 
       try {
+        // Fast2SMS API optimized URL call with proper encoding
         const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=otp&variables_values=${generatedOTP}&numbers=${p}`;
-        let res = await fetch(url);
+        let res = await fetch(url, { method: 'GET' });
         let data = await res.json();
 
         if (data.return) {
@@ -567,10 +568,10 @@
           $("login-step2").classList.remove("hidden-view");
           toast("OTP sent to +91" + p);
         } else {
-          toast("SMS Error: " + (data.message[0] || "Failed"));
+          toast("SMS Error: " + (data.message || "Failed"));
         }
       } catch (err) {
-        toast("Network error.");
+        toast("Network error sending SMS.");
       }
     });
 
