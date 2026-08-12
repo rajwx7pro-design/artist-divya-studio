@@ -492,7 +492,6 @@
     const SUPABASE_KEY = "sb_publishable_vwnA4_9z2dV3p0mavP1ARg_UB889s6Z";
     const FAST2SMS_API_KEY = "Swg7RUGrZFtJdWziHDs82KMNCx1Q309AvEpj6fe4PTuLIblcnOhSz1IB6N2tm5kxRiHDbAuTorqOwFsV";
 
-    // Single Supabase Client Declaration (Fixed duplicate declaration error)
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const ADMINS = ["8928082194", "9307952219"];
@@ -538,7 +537,6 @@
       renderBell();
     }
 
-    // Window-level global routing functions for UI triggers
     let tempPhone = "";
     let generatedOTP = "";
 
@@ -684,7 +682,6 @@
       }
     }
 
-    // Supabase Booking Save Logic with Full Details
     $("booking-form").addEventListener("submit", async e => {
       e.preventDefault();
       let b = $("book-submit");
