@@ -559,7 +559,7 @@
 
       try {
         // Fast2SMS API URL corrected with proper template variables
-        const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=dlt&sender_id=FSTSMS&message=Your%20verification%20code%20is%20${generatedOTP}&language=english&flash=0&numbers=${p}`;
+        const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=otp&variables_values=${generatedOTP}&numbers=${p}`;
         let res = await fetch(url, { method: 'GET' });
         let data = await res.json();
 
