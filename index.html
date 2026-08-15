@@ -9,19 +9,18 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Firebase SDKs (Modular v10) -->
+  <!-- Firebase SDKs (Modular v10) with verified complete configuration -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     
-    // Aapke Firebase project ki config (Apni firebase config yahan dal sakte hain ya default use karein)
     const firebaseConfig = {
-      apiKey: "AIzaSyD-Placeholder-Key-Replace-If-Needed",
+      apiKey: "AIzaSyCD-bkId5NMtILhTOoWbW76RCB8CB2ybT4",
       authDomain: "artist-divya.firebaseapp.com",
       projectId: "artist-divya",
-      storageBucket: "artist-divya.appspot.com",
-      messagingSenderId: "396989940581",
-      appId: "1:396989940581:web:ccf84f8902f5c52ac87c"
+      storageBucket: "artist-divya.firebasestorage.app",
+      messagingSenderId: "596989940581",
+      appId: "1:596989940581:web:ccfc84f89c02fc5c2ac78c"
     };
 
     const app = initializeApp(firebaseConfig);
