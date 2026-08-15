@@ -9,6 +9,28 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
+  <!-- Firebase SDKs (Modular v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    
+    // Aapke Firebase project ki config (Apni firebase config yahan dal sakte hain ya default use karein)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-Placeholder-Key-Replace-If-Needed",
+      authDomain: "artist-divya.firebaseapp.com",
+      projectId: "artist-divya",
+      storageBucket: "artist-divya.appspot.com",
+      messagingSenderId: "396989940581",
+      appId: "1:396989940581:web:ccf84f8902f5c52ac87c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    window.firebaseAuth = auth;
+    window.RecaptchaVerifier = RecaptchaVerifier;
+    window.signInWithPhoneNumber = signInWithPhoneNumber;
+  </script>
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   
   <style>
@@ -324,7 +346,9 @@
       <label class="block mb-1 text-xs text-stone-400">Mobile Phone</label>
       <input id="login-phone" required maxlength="10" inputmode="numeric" placeholder="10-digit number" class="w-full rounded-lg p-2.5 text-xs">
      </div>
-     <button class="gold w-full rounded-lg py-2.5 text-xs font-bold" type="submit" id="send-otp-btn">Send OTP via SMS</button>
+     <!-- Firebase reCAPTCHA Container -->
+     <div id="recaptcha-container" class="my-2"></div>
+     <button class="gold w-full rounded-lg py-2.5 text-xs font-bold" type="submit" id="send-otp-btn">Send OTP via Firebase</button>
     </form>
 
     <form id="login-step2" class="mt-5 space-y-4 hidden-view">
@@ -490,7 +514,6 @@
   <script>
     const SUPABASE_URL = "https://mqeqpootefowpmpingua.supabase.co";
     const SUPABASE_KEY = "sb_publishable_vwnA4_9z2dV3p0mavP1ARg_UB889s6Z";
-    const FAST2SMS_API_KEY = "Swg7RUGrZFtJdWziHDs82KMNCx1Q309AvEpj6fe4PTuLIblcnOhSz1IB6N2tm5kxRiHDbAuTorqOwFsV";
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -538,7 +561,7 @@
     }
 
     let tempPhone = "";
-    let generatedOTP = "";
+    let confirmationResultGlobal = null;
 
     window.openLogin = function() {
       tempPhone = "";
@@ -546,6 +569,18 @@
       $("login-step2").classList.add("hidden-view");
       $("login-step3").classList.add("hidden-view");
       openModal("login-modal");
+      
+      // Initialize Firebase reCAPTCHA
+      setTimeout(() => {
+        try {
+          if (!window.recaptchaVerifier && window.firebaseAuth && window.RecaptchaVerifier) {
+            window.recaptchaVerifier = new window.RecaptchaVerifier(window.firebaseAuth, 'recaptcha-container', {
+              'size': 'normal'
+            });
+            window.recaptchaVerifier.render();
+          }
+        } catch(e) { console.error("Recaptcha error:", e); }
+      }, 500);
     };
 
     $("login-step1").addEventListener("submit", async e => {
@@ -553,33 +588,29 @@
       let p = $("login-phone").value.replace(/\D/g, "");
       if (p.length !== 10) { toast("Enter valid 10-digit number."); return; }
       tempPhone = p;
-
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      toast("Sending OTP via SMS...");
+      toast("Sending OTP via Firebase...");
 
       try {
-        // Fast2SMS API URL corrected with proper template variables
-        const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=otp&variables_values=${generatedOTP}&numbers=${p}`;
-        let res = await fetch(url, { method: 'GET' });
-        let data = await res.json();
+        const formattedPhone = "+91" + p;
+        const appVerifier = window.recaptchaVerifier;
+        const confirmationResult = await window.signInWithPhoneNumber(window.firebaseAuth, formattedPhone, appVerifier);
+        confirmationResultGlobal = confirmationResult;
 
-        if (data.return) {
-          $("login-step1").classList.add("hidden-view");
-          $("login-step2").classList.remove("hidden-view");
-          toast("OTP sent to +91" + p);
-        } else {
-          toast("SMS Error: " + (data.message || "Failed"));
-        }
+        $("login-step1").classList.add("hidden-view");
+        $("login-step2").classList.remove("hidden-view");
+        toast("OTP sent to +91 " + p);
       } catch (err) {
-        toast("Network error sending SMS.");
+        console.error(err);
+        toast("SMS Error: " + (err.message || "Failed"));
       }
     });
 
-    $("login-step2").addEventListener("submit", e => {
+    $("login-step2").addEventListener("submit", async e => {
       e.preventDefault();
       let otp = $("login-otp").value.trim();
       
-      if (otp === generatedOTP) {
+      try {
+        const result = await confirmationResultGlobal.confirm(otp);
         if (userRegistry[tempPhone]) {
           localStorage.setItem("divya_phone", tempPhone);
           localStorage.setItem("divya_name", userRegistry[tempPhone]);
@@ -590,7 +621,7 @@
           $("login-step2").classList.add("hidden-view");
           $("login-step3").classList.remove("hidden-view");
         }
-      } else {
+      } catch (err) {
         toast("Invalid OTP code!");
       }
     });
