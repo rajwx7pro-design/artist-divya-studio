@@ -1,52 +1,10 @@
 rules_version = '2';
-
 service cloud.firestore {
-      match /databases/{database}/documents {
-
-            // Helper functions
-                function isAuthenticated() {
-                          return request.auth != null;
-                }
-                    
-                        function isOwner(userId) {
-                                  return isAuthenticated() && request.auth.uid == userId;
-                        }
-
-                            // 1. Coupons Collection
-                                match /coupons/{couponId} {
-                                          // Koi bhi user/visitor coupons verify karne ke liye padh sakta hai
-                                                allow read: if true;
-                                                      
-                                                            // Sirf Authenticated Admin naye coupons create, edit, ya delete kar sakta hai
-                                                                  allow write: if isAuthenticated() && request.auth.token.admin == true;
-                                }
-
-                                    // 2. Orders Collection
-                                        match /orders/{orderId} {
-                                                  // User sirf apne khud ke create kiye hue orders dekh sakta hai
-                                                        allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
-                                                              
-                                                                    // Authenticated user naya order place kar sakta hai
-                                                                          allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-                                                                                
-                                                                                      // User apna order status "Cancelled" update kar sakta hai
-                                                                                            allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || request.auth.token.admin == true);
-                                                                                                  
-                                                                                                        // Direct hard delete non-admin ke liye disabled hai
-                                                                                                              allow delete: if isAuthenticated() && request.auth.token.admin == true;
-                                        }
-
-                                            // Default deny for all other collections
-                                                match /{document=**} {
-                                                          allow read, write: if false;
-                                                }
-      }
-}
-
-                                                }
-                                        }
-                                }
-                        }
-                }
-      }
+  match /databases/{database}/documents {
+    // Orders collection ke liye rule
+    match /orders/{orderId} = {
+      // Koi bhi signed-in user order create kar sakta hai, aur read/update kar sakta hai
+      allow read, write: if request.auth != null;
+    }
+  }
 }
